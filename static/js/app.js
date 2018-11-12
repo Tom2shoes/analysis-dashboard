@@ -20,21 +20,8 @@ function buildMetadata(sample) {
 )};
 
 function buildCharts(sample) {
-
-  // @TODO: Use `d3.json` to fetch the sample data for the plots
   let url= "/samples/" + sample;
   d3.json(url).then(function(response) {
-
-    
-    console.log(response);
-
-    // @TODO: Build a Bubble Chart using the sample data
-
-    // @TODO: Build a Pie Chart
-    // HINT: You will need to use slice() to grab the top 10 sample_values,
-    // otu_ids, and labels (10 each).
-    
- 
     
     let restructure = response.sample_values.map(function(x, i) {
       return {
@@ -45,26 +32,62 @@ function buildCharts(sample) {
 
     restructure.sort(function(a, b){return b.sample_values-a.sample_values});
 
-    let slice = restructure.slice(0,11);
-
-    console.log(slice);
-
-    xl = slice.map
-
+    let sliced = restructure.slice(0,10);
+    
+    //empty arrays for Plotly
+    slicedLabels = [];
+    slicedIds = [];
+    slicedValues = [];
+    
+    // pushing object values into arrays for Plotly
+    for (const x of sliced) {
+      slicedValues.push(x.sample_values)
+      slicedLabels.push(x.otu_labels);
+      slicedIds.push(x.otu_ids)
+    }
+    
+    // Plotly PieChart
     let data = [{
-      values: slice['sample_values'],
-      labels: slice['otu_labels'],
-      type: 'pie'
+      values: slicedValues,
+      labels: slicedIds,
+      hovertext: slicedLabels,
+      type: "pie"
     }];
 
     let layout = {
-      height: 600,
-      width: 600
+      title: `Sample #${sample}`
     };
-
-
     
     Plotly.newPlot("pie", data, layout);
+    
+
+    // Plotly BubbleChart
+    let trace1 = {
+      x: response.otu_ids,
+      y: response.sample_values,
+      text: response.otu_labels,
+      mode: 'markers',
+      marker: {
+        size: response.sample_values,
+        color: response.otu_ids,
+        opacity: response.otu_ids
+      }
+    };
+    
+    let data2 = [trace1];
+    
+    let layout2 = {
+      title: `Sample #${sample}`,
+      showlegend: false,
+      xaxis: {
+        title: 'OTU ID',
+      },
+      yaxis: {
+        title: 'Sample Values',
+      },
+    };
+    
+    Plotly.newPlot('bubble', data2, layout2);
   });
 }
 
