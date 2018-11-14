@@ -1,0 +1,1 @@
+FLASK_APP=bb-dashboard/app.py flask run
