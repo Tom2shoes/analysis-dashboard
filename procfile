@@ -1,1 +1,1 @@
-web: gunicorn bb-dashboard:app
+web: gunicorn bb-dashboard.app:app
